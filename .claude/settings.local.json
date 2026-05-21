@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv CLAUDE.md ../CLAUDE.md.tmp)",
+      "Bash(mv README.md ../README.md.tmp)",
+      "Bash(npm --version)",
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --app --no-src-dir --eslint --import-alias \"@/*\" --use-npm --skip-install)",
+      "Bash(npx --yes create-next-app@latest studysync-temp --typescript --tailwind --app --no-src-dir --eslint --import-alias \"@/*\" --use-npm --skip-install)",
+      "Bash(npm install *)",
+      "Bash(cat C:\\\\\\\\Users\\\\\\\\tusha\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Users-tusha-Documents-Project-StudySync-StudySync-\\\\\\\\9adfb7db-81f2-4e73-afa9-1d5592487f55\\\\\\\\tasks\\\\\\\\bi4xmk54a.output)",
+      "Bash(npm ls *)",
+      "Bash(npx --yes shadcn@latest init --base-color zinc --yes --force)",
+      "Bash(npx --yes shadcn@latest init --help)",
+      "Bash(npx --yes shadcn@latest init --defaults --force)",
+      "Bash(npx --yes shadcn@latest add card input label badge tabs dialog dropdown-menu separator avatar sonner --yes)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(git check-ignore *)",
+      "Bash(supabase --version)",
+      "Bash(psql --version)",
+      "Bash(node *)",
+      "Bash(curl -s -o /dev/null -w \"GET /          : %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"GET /login     : %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(curl -s -o /dev/null -w \"GET /dashboard : %{http_code} \\(302 expected when logged out\\)\\\\n\" http://localhost:3000/dashboard)",
+      "Bash(curl -s -I http://localhost:3000/dashboard)",
+      "Bash(curl -s https://atghzuklyeaajnpjrbhm.supabase.co/auth/v1/settings -H \"apikey: $\\(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s \"https://atghzuklyeaajnpjrbhm.supabase.co/auth/v1/settings\" -H \"apikey: $\\(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local)",
+      "Bash(curl *)",
+      "Bash(taskkill /PID 6948 /F)",
+      "PowerShell(Stop-Process *)"
+    ]
+  }
+}
