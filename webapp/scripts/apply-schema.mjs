@@ -1,5 +1,5 @@
 // Apply the full schema.sql via Supabase Management API.
-// Run with: node --env-file=.env.local scripts/apply-schema.mjs
+// Run with: node --env-file=../.env.local scripts/apply-schema.mjs
 import { readFileSync } from 'fs';
 
 const PROJECT_REF = 'atghzuklyeaajnpjrbhm';

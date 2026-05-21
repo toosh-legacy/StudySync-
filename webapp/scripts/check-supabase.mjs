@@ -1,5 +1,5 @@
 // Sanity-check Supabase connectivity using the service-role key.
-// Run with: node --env-file=.env.local scripts/check-supabase.mjs
+// Run with: node --env-file=../.env.local scripts/check-supabase.mjs
 import { createClient } from '@supabase/supabase-js';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

@@ -1,4 +1,4 @@
-// Run with: node --env-file=.env.local scripts/apply-share-migration.mjs
+// Run with: node --env-file=../.env.local scripts/apply-share-migration.mjs
 
 const PROJECT_REF = 'atghzuklyeaajnpjrbhm';
 const token = process.env.SUPABASE_ACCESS_TOKEN;

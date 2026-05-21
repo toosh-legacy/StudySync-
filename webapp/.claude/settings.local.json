@@ -23,9 +23,9 @@
       "Bash(curl -s -o /dev/null -w \"GET /login     : %{http_code}\\\\n\" http://localhost:3000/login)",
       "Bash(curl -s -o /dev/null -w \"GET /dashboard : %{http_code} \\(302 expected when logged out\\)\\\\n\" http://localhost:3000/dashboard)",
       "Bash(curl -s -I http://localhost:3000/dashboard)",
-      "Bash(curl -s https://atghzuklyeaajnpjrbhm.supabase.co/auth/v1/settings -H \"apikey: $\\(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local)",
+      "Bash(curl -s https://atghzuklyeaajnpjrbhm.supabase.co/auth/v1/settings -H \"apikey: $\\(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' ../.env.local)",
       "Bash(python3 -m json.tool)",
-      "Bash(curl -s \"https://atghzuklyeaajnpjrbhm.supabase.co/auth/v1/settings\" -H \"apikey: $\\(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local)",
+      "Bash(curl -s \"https://atghzuklyeaajnpjrbhm.supabase.co/auth/v1/settings\" -H \"apikey: $\\(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' ../.env.local)",
       "Bash(curl *)",
       "Bash(taskkill /PID 6948 /F)",
       "PowerShell(Stop-Process *)"

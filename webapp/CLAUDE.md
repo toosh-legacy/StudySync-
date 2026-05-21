@@ -131,16 +131,17 @@ local development.
 ```
 studysync/
 │
-├── CLAUDE.md                         ← This file
-├── .env.local                        ← Never commit
-├── .env.example                      ← Commit this with placeholder values
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-├── next.config.ts
-├── middleware.ts                     ← Session refresh on every request
-│
-├── app/
+├── .env.local                        ← Never commit (repo root)
+├── webapp/
+│   ├── CLAUDE.md                     ← This file
+│   ├── .env.example                  ← Commit this with placeholder values
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── tailwind.config.ts
+│   ├── next.config.ts
+│   ├── middleware.ts                 ← Session refresh on every request
+│   │
+│   ├── app/
 │   ├── layout.tsx                    ← Root layout with providers
 │   ├── page.tsx                      ← Public landing page
 │   │
@@ -196,7 +197,7 @@ studysync/
 │           └── keys/[id]/
 │               └── route.ts         ← DELETE (revoke)
 │
-├── components/
+│   ├── components/
 │   ├── ui/                          ← shadcn/ui (auto-generated, do not edit)
 │   ├── auth/
 │   │   └── OAuthButton.tsx
@@ -208,7 +209,7 @@ studysync/
 │   └── connections/
 │       └── ProviderCard.tsx
 │
-├── lib/
+│   ├── lib/
 │   ├── supabase/
 │   │   ├── server.ts               ← createServerClient using next/headers cookies
 │   │   ├── client.ts               ← createBrowserClient singleton
@@ -237,8 +238,9 @@ studysync/
 └── extension/
     ├── manifest.json
     ├── package.json
-    ├── vite.config.ts
-    └── src/
+  │   ├── extension/
+  │   │   ├── vite.config.ts
+  │   │   └── src/
         ├── background/
         │   └── service-worker.ts
         ├── content/
@@ -259,13 +261,18 @@ studysync/
             └── lib/
                 ├── api.ts          ← Typed fetch wrapper for the StudySync API
                 └── storage.ts      ← chrome.storage.local typed wrappers
+│
+└── api/
+  ├── package.json
+  ├── tsconfig.json
+  └── src/
 ```
 
 ---
 
 ## Part 5 — Environment Variables
 
-Create `.env.local` with these exact variable names. The `.env.example` file should
+Create `.env.local` at the repo root with these exact variable names. The `.env.example` file should
 contain the same keys with empty or placeholder values and must be committed to git.
 
 ```
