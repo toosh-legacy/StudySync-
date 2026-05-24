@@ -12,6 +12,7 @@ import { fetchCanvasContent } from '../lib/connectors/canvas.js';
 import { fetchMoodleContent } from '../lib/connectors/moodle.js';
 import { fetchObsidianContent } from '../lib/connectors/obsidian.js';
 import type { CollectedItem, Provider } from '../lib/connectors/types.js';
+import { decryptSecret, encryptSecret } from '../lib/crypto.js';
 
 export const sourcesRouter = new Hono();
 sourcesRouter.use('*', requireAuth);
@@ -66,17 +67,19 @@ sourcesRouter.post('/collect', async (c) => {
       continue;
     }
 
-    let accessToken = conn.access_token ?? '';
-    if (provider === 'google_drive' && conn.refresh_token) {
+    // Tokens are stored encrypted at rest; decrypt before use.
+    let accessToken = decryptSecret(conn.access_token) ?? '';
+    const refreshToken = decryptSecret(conn.refresh_token);
+    if (provider === 'google_drive' && refreshToken) {
       const expiresAt = conn.token_expires_at ? new Date(conn.token_expires_at).getTime() : 0;
       if (expiresAt - Date.now() < REFRESH_WINDOW_MS) {
         try {
-          const refreshed = await refreshGoogleAccessToken(conn.refresh_token);
+          const refreshed = await refreshGoogleAccessToken(refreshToken);
           accessToken = refreshed.accessToken;
           await admin
             .from('source_connections')
             .update({
-              access_token: refreshed.accessToken,
+              access_token: encryptSecret(refreshed.accessToken),
               token_expires_at: refreshed.expiryDate.toISOString(),
               updated_at: new Date().toISOString(),
             })
@@ -105,7 +108,7 @@ sourcesRouter.post('/collect', async (c) => {
     let result;
     try {
       if (provider === 'google_drive') {
-        result = await fetchGoogleDriveContent(accessToken, conn.refresh_token ?? '');
+        result = await fetchGoogleDriveContent(accessToken, refreshToken ?? '');
       } else if (provider === 'notion') {
         result = await fetchNotionContent(accessToken);
       } else if (provider === 'canvas') {

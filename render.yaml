@@ -1,0 +1,63 @@
+# Render Blueprint for the StudySync API.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy: push this repo, then on render.com go to Blueprints -> New Blueprint
+# Instance, point it at this repo, and apply. Secret values (sync: false) are
+# prompted for in the dashboard on first apply.
+services:
+  - type: web
+    name: studysync-api
+    runtime: docker
+    plan: free
+    rootDir: api
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    healthCheckPath: /v1/healthz
+    autoDeploy: true
+    envVars:
+      # NODE_ENV is set in the Dockerfile; PORT is injected by Render.
+      # API_PUBLIC_URL is omitted on purpose: the app falls back to
+      # RENDER_EXTERNAL_URL (auto-injected) so this is zero-config.
+
+      # --- Required secrets (entered in the dashboard on first apply) ---
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+      # --- Recommended for production ---
+      # Web app origin allowed by CORS (e.g. https://studysync.vercel.app).
+      - key: WEB_APP_URL
+        sync: false
+      # AES-256-GCM key for encrypting provider tokens at rest. Generate with:
+      #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+      - key: TOKEN_ENCRYPTION_KEY
+        generateValue: true
+
+      # --- Optional: rate limiting (fails open if absent) ---
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+
+      # --- Optional: durable async jobs via QStash ---
+      - key: QSTASH_TOKEN
+        sync: false
+      - key: QSTASH_CURRENT_SIGNING_KEY
+        sync: false
+      - key: QSTASH_NEXT_SIGNING_KEY
+        sync: false
+
+      # --- Optional: source connectors (server-side OAuth apps) ---
+      - key: GOOGLE_DRIVE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_DRIVE_CLIENT_SECRET
+        sync: false
+      - key: NOTION_OAUTH_CLIENT_ID
+        sync: false
+      - key: NOTION_OAUTH_CLIENT_SECRET
+        sync: false

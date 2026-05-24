@@ -17,7 +17,7 @@ sharesRouter.get('/:id', async (c) => {
   const admin = createAdminClient();
   const { data: output } = await admin
     .from('generated_outputs')
-    .select('id, course_id, output_format, depth, output, sources_used_count, created_at, public_share')
+    .select('id, course_id, output_format, depth, comprehension, output, sources_used_count, created_at, public_share')
     .eq('id', id)
     .eq('public_share', true)
     .maybeSingle();
@@ -40,6 +40,7 @@ sharesRouter.get('/:id', async (c) => {
     id: output.id,
     output_format: output.output_format,
     depth: output.depth,
+    comprehension: output.comprehension ?? 'intermediate',
     output: output.output,
     sources_used_count: output.sources_used_count,
     created_at: output.created_at,

@@ -35,7 +35,7 @@ vaultRouter.get('/', async (c) => {
   let query = admin
     .from('generated_outputs')
     .select(
-      'id, course_id, output_format, depth, sources_used_count, prompt_tokens, completion_tokens, cache_hit, output, created_at',
+      'id, course_id, output_format, depth, comprehension, sources_used_count, prompt_tokens, completion_tokens, cache_hit, output, created_at',
     )
     .eq('user_id', user.userId)
     .order('created_at', { ascending: false })

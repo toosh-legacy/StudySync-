@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ALLOWED_MODELS } from '../lib/openai/models.js';
 
 const hexColor = z
   .string()
@@ -76,6 +77,16 @@ export const outputFormatSchema = z.enum([
   'mind_map',
 ]);
 export const depthSchema = z.enum(['quick', 'standard', 'deep']);
+export const comprehensionSchema = z.enum([
+  'beginner',
+  'intermediate',
+  'advanced',
+  'expert',
+]);
+export const modelSchema = z.enum(
+  ALLOWED_MODELS as [string, ...string[]],
+  { errorMap: () => ({ message: `must be one of: ${ALLOWED_MODELS.join(', ')}` }) },
+);
 
 export const generateSourceSchema = z.object({
   provider: z.string(),
@@ -88,14 +99,28 @@ export const generateRequestSchema = z.object({
   course_id: z.string().uuid(),
   output_format: outputFormatSchema,
   depth: depthSchema.default('standard'),
+  comprehension: comprehensionSchema.default('intermediate'),
+  model: modelSchema.optional(),
   sources: z.array(generateSourceSchema).min(1).max(10),
   user_prompt: z.string().max(1_000).optional(),
 });
 
+export type GenerateRequest = z.infer<typeof generateRequestSchema>;
+
+// Async job submission: a generate request plus an optional webhook callback.
+export const generateJobSchema = generateRequestSchema.extend({
+  callback_url: z.string().url().optional(),
+});
+export type GenerateJobRequest = z.infer<typeof generateJobSchema>;
+
 // ---------- API keys ----------
+export const scopeSchema = z.enum(['generate:read', 'generate:write']);
 export const apiKeyCreateSchema = z.object({
   label: z.string().trim().min(1).max(120),
   expires_at: z.string().datetime().optional(),
+  scopes: z.array(scopeSchema).min(1).optional(),
+  rate_limit_per_min: z.number().int().min(1).max(10_000).optional(),
+  daily_token_quota: z.number().int().min(1).optional(),
 });
 
 // ---------- Preferences ----------

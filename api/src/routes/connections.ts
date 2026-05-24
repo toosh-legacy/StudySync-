@@ -11,6 +11,8 @@ import {
 import { buildGoogleAuthUrl, exchangeGoogleCode } from '../lib/oauth/google.js';
 import { buildNotionAuthUrl, exchangeNotionCode } from '../lib/oauth/notion.js';
 import { signOAuthState, verifyOAuthState } from '../lib/oauth/state.js';
+import { encryptSecret } from '../lib/crypto.js';
+import { publicBaseUrl } from '../lib/env.js';
 
 type Provider = 'google_drive' | 'notion' | 'canvas' | 'moodle' | 'obsidian';
 const ALL_PROVIDERS: readonly Provider[] = [
@@ -23,7 +25,7 @@ const ALL_PROVIDERS: readonly Provider[] = [
 const VALID = new Set<Provider>(ALL_PROVIDERS);
 
 function apiPublicUrl(): string {
-  return process.env.API_PUBLIC_URL ?? 'http://localhost:3001';
+  return publicBaseUrl();
 }
 
 function webAppUrl(): string {
@@ -122,7 +124,7 @@ authedRouter.post('/:provider', async (c) => {
         connected: true,
         display_name: userInfo.name ?? 'Canvas user',
         detail_label: cleanUrl,
-        access_token: parsed.data.api_token,
+        access_token: encryptSecret(parsed.data.api_token),
         metadata: { canvas_url: cleanUrl, canvas_user_id: userInfo.id ?? null },
         updated_at: new Date().toISOString(),
       },
@@ -173,7 +175,7 @@ authedRouter.post('/:provider', async (c) => {
         connected: true,
         display_name: info.fullname ?? 'Moodle user',
         detail_label: info.sitename ?? cleanUrl,
-        access_token: parsed.data.web_service_token,
+        access_token: encryptSecret(parsed.data.web_service_token),
         metadata: { moodle_url: cleanUrl, moodle_user_id: info.userid ?? null },
         updated_at: new Date().toISOString(),
       },
@@ -242,9 +244,11 @@ authedRouter.delete('/:provider/disconnect', async (c) => {
 });
 
 // ---- PUBLIC OAUTH CALLBACK (no auth — verified via signed state) ----
+// Registered BEFORE the authed router is mounted so that authedRouter's
+// `use('*', requireAuth)` middleware does not gate the public callback (which is
+// hit by the provider's redirect with no credentials).
 
 export const connectionsRouter = new Hono();
-connectionsRouter.route('/', authedRouter);
 
 connectionsRouter.get('/:provider/callback', async (c) => {
   const provider = c.req.param('provider');
@@ -281,8 +285,8 @@ connectionsRouter.get('/:provider/callback', async (c) => {
           connected: true,
           display_name: tokens.email,
           detail_label: tokens.email,
-          access_token: tokens.accessToken,
-          refresh_token: tokens.refreshToken,
+          access_token: encryptSecret(tokens.accessToken),
+          refresh_token: encryptSecret(tokens.refreshToken),
           token_expires_at: tokens.expiryDate.toISOString(),
           metadata: {},
           updated_at: new Date().toISOString(),
@@ -298,7 +302,7 @@ connectionsRouter.get('/:provider/callback', async (c) => {
           connected: true,
           display_name: result.workspaceName,
           detail_label: result.workspaceName,
-          access_token: result.accessToken,
+          access_token: encryptSecret(result.accessToken),
           metadata: { bot_id: result.botId, workspace_icon: result.workspaceIcon },
           updated_at: new Date().toISOString(),
         },
@@ -312,3 +316,7 @@ connectionsRouter.get('/:provider/callback', async (c) => {
 
   return c.redirect(redirectToConnections('success', provider).toString());
 });
+
+// Mount the authenticated routes last so their `use('*', requireAuth)` middleware
+// applies only to them and not to the public callback registered above.
+connectionsRouter.route('/', authedRouter);

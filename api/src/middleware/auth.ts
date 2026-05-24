@@ -3,10 +3,20 @@ import type { Context, MiddlewareHandler } from 'hono';
 import { createAdminClient, verifyJwt } from '../lib/supabase.js';
 import { apiError, ErrorCode } from '../lib/errors.js';
 
+export const ALL_SCOPES = ['generate:read', 'generate:write'] as const;
+export type Scope = (typeof ALL_SCOPES)[number];
+
 export interface AuthenticatedUser {
   userId: string;
   plan: string;
   method: 'jwt' | 'api_key';
+  /** Scopes granted to this caller. JWT sessions get all scopes. */
+  scopes: string[];
+  /** Per-key overrides (api_key method only). */
+  rateLimitPerMin: number | null;
+  dailyTokenQuota: number | null;
+  /** The api_keys.id, for usage attribution (api_key method only). */
+  keyId: string | null;
 }
 
 declare module 'hono' {
@@ -37,6 +47,10 @@ async function authenticate(c: Context): Promise<AuthenticatedUser | null> {
           userId: verified.userId,
           plan: profile?.plan ?? 'free',
           method: 'jwt',
+          scopes: [...ALL_SCOPES],
+          rateLimitPerMin: null,
+          dailyTokenQuota: null,
+          keyId: null,
         };
       }
     }
@@ -48,7 +62,7 @@ async function authenticate(c: Context): Promise<AuthenticatedUser | null> {
     const admin = createAdminClient();
     const { data: keyRow } = await admin
       .from('api_keys')
-      .select('id, user_id, plan, expires_at, revoked')
+      .select('id, user_id, plan, expires_at, revoked, scopes, rate_limit_per_min, daily_token_quota')
       .eq('key_hash', keyHash)
       .eq('revoked', false)
       .maybeSingle();
@@ -67,6 +81,10 @@ async function authenticate(c: Context): Promise<AuthenticatedUser | null> {
         userId: keyRow.user_id,
         plan: keyRow.plan,
         method: 'api_key',
+        scopes: keyRow.scopes ?? [...ALL_SCOPES],
+        rateLimitPerMin: keyRow.rate_limit_per_min ?? null,
+        dailyTokenQuota: keyRow.daily_token_quota ?? null,
+        keyId: keyRow.id,
       };
     }
   }
@@ -83,3 +101,15 @@ export const requireAuth: MiddlewareHandler = async (c, next) => {
   c.set('user', user);
   await next();
 };
+
+/** Middleware factory enforcing that the caller holds a given scope. Must run after requireAuth. */
+export function requireScope(scope: Scope): MiddlewareHandler {
+  return async (c, next) => {
+    const user = c.get('user');
+    if (!user || !user.scopes.includes(scope)) {
+      const err = apiError(ErrorCode.FORBIDDEN, `Missing required scope: ${scope}`, 403);
+      return c.json(err.body, 403);
+    }
+    await next();
+  };
+}

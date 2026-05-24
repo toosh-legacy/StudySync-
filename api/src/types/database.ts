@@ -158,6 +158,7 @@ export type Database = {
             | 'summary'
             | 'mind_map';
           depth: 'quick' | 'standard' | 'deep';
+          comprehension: 'beginner' | 'intermediate' | 'advanced' | 'expert';
           output: Json;
           sources_read: Json;
           sources_used_count: number;
@@ -181,6 +182,7 @@ export type Database = {
             | 'summary'
             | 'mind_map';
           depth?: 'quick' | 'standard' | 'deep';
+          comprehension?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
           output: Json;
           sources_read?: Json;
           sources_used_count?: number;
@@ -222,6 +224,9 @@ export type Database = {
           last_used_at: string | null;
           expires_at: string | null;
           revoked: boolean;
+          scopes: string[];
+          rate_limit_per_min: number | null;
+          daily_token_quota: number | null;
           created_at: string;
         };
         Insert: {
@@ -235,9 +240,78 @@ export type Database = {
           last_used_at?: string | null;
           expires_at?: string | null;
           revoked?: boolean;
+          scopes?: string[];
+          rate_limit_per_min?: number | null;
+          daily_token_quota?: number | null;
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['api_keys']['Insert']>;
+        Relationships: [];
+      };
+      idempotency_keys: {
+        Row: {
+          user_id: string;
+          idempotency_key: string;
+          request_hash: string;
+          response: Json;
+          created_at: string;
+          expires_at: string;
+        };
+        Insert: {
+          user_id: string;
+          idempotency_key: string;
+          request_hash: string;
+          response: Json;
+          created_at?: string;
+          expires_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['idempotency_keys']['Insert']>;
+        Relationships: [];
+      };
+      generation_jobs: {
+        Row: {
+          id: string;
+          user_id: string;
+          status: 'queued' | 'processing' | 'completed' | 'failed';
+          request: Json;
+          result: Json | null;
+          error: Json | null;
+          callback_url: string | null;
+          callback_status: string | null;
+          user_ctx: Json | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          status?: 'queued' | 'processing' | 'completed' | 'failed';
+          request: Json;
+          result?: Json | null;
+          error?: Json | null;
+          callback_url?: string | null;
+          callback_status?: string | null;
+          user_ctx?: Json | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['generation_jobs']['Insert']>;
+        Relationships: [];
+      };
+      embedding_cache: {
+        Row: {
+          content_hash: string;
+          model: string;
+          embedding: Json;
+          created_at: string;
+        };
+        Insert: {
+          content_hash: string;
+          model: string;
+          embedding: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['embedding_cache']['Insert']>;
         Relationships: [];
       };
     };
@@ -250,6 +324,10 @@ export type Database = {
       increment_api_key_usage: {
         Args: { p_id: string };
         Returns: void;
+      };
+      check_budget_and_lock: {
+        Args: { p_user_id: string; p_date: string; p_budget: number };
+        Returns: boolean;
       };
     };
     Enums: Record<string, never>;

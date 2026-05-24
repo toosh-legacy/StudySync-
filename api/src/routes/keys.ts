@@ -17,7 +17,9 @@ keysRouter.get('/', async (c) => {
   const admin = createAdminClient();
   const { data } = await admin
     .from('api_keys')
-    .select('id, label, key_prefix, plan, usage_count, last_used_at, expires_at, revoked, created_at')
+    .select(
+      'id, label, key_prefix, plan, scopes, rate_limit_per_min, daily_token_quota, usage_count, last_used_at, expires_at, revoked, created_at',
+    )
     .eq('user_id', user.userId)
     .order('created_at', { ascending: false });
   return c.json(data ?? []);
@@ -46,8 +48,15 @@ keysRouter.post('/', async (c) => {
       key_prefix: prefix,
       plan: user.plan,
       expires_at: parsed.data.expires_at ?? null,
+      ...(parsed.data.scopes ? { scopes: parsed.data.scopes } : {}),
+      ...(parsed.data.rate_limit_per_min != null
+        ? { rate_limit_per_min: parsed.data.rate_limit_per_min }
+        : {}),
+      ...(parsed.data.daily_token_quota != null
+        ? { daily_token_quota: parsed.data.daily_token_quota }
+        : {}),
     })
-    .select('id, label, key_prefix, plan, created_at, expires_at')
+    .select('id, label, key_prefix, plan, scopes, rate_limit_per_min, daily_token_quota, created_at, expires_at')
     .single();
 
   if (error || !data) {
