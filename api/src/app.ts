@@ -16,6 +16,7 @@ import { sharesRouter } from './routes/shares.js';
 import { connectionsRouter } from './routes/connections.js';
 import { sourcesRouter } from './routes/sources.js';
 import { generateRouter, jobProcessHandler } from './routes/generate.js';
+import { publicGenerateRouter } from './routes/public-generate.js';
 import { JOB_PROCESS_PATH } from './lib/queue.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { usageRouter } from './routes/usage.js';
@@ -88,6 +89,7 @@ export function createApp(): Hono {
   app.route('/v1/connections', connectionsRouter);
   app.route('/v1/sources', sourcesRouter);
   app.route('/v1/generate', generateRouter);
+  app.route('/v1/public/generate', publicGenerateRouter);
   // Internal QStash delivery endpoint (verified by signature, not auth).
   app.post(JOB_PROCESS_PATH, jobProcessHandler);
   app.route('/v1/dashboard', dashboardRouter);
