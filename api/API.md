@@ -18,19 +18,24 @@ The StudySync API has two surfaces:
 
 ### `POST /v1/public/generate`
 
-Generate structured study material in a single request. Bring your own OpenAI
-key — StudySync never stores it or bills against it.
+Generate structured study material in a single request. Bring your own LLM
+key — **OpenAI or Anthropic** — and StudySync never stores it or bills against
+it. The provider is auto-detected from the key prefix:
+
+- `sk-ant-...` → Anthropic Claude (default model: `claude-haiku-4-5-20251001`,
+  uses tool-call structured output)
+- `sk-...` → OpenAI (default model: `gpt-4o-mini`, uses strict JSON schema)
 
 **Request body**
 
-| Field           | Type   | Required | Notes                                                            |
-| --------------- | ------ | -------- | ---------------------------------------------------------------- |
-| `llm_key`       | string | yes      | Your OpenAI API key. Used only for this request.                 |
-| `content`       | string | yes      | Raw study material. Max 300,000 characters.                      |
-| `output_format` | enum   | yes      | See formats below.                                               |
-| `depth`         | enum   | no       | `quick` · `standard` (default) · `deep`.                         |
-| `user_prompt`   | string | no       | Extra instructions. Max 1,000 chars.                             |
-| `model`         | string | no       | OpenAI model id. Default `gpt-4o-mini`.                          |
+| Field           | Type   | Required | Notes                                                                       |
+| --------------- | ------ | -------- | --------------------------------------------------------------------------- |
+| `llm_key`       | string | yes      | Your OpenAI **or** Anthropic API key. Used only for this request.           |
+| `content`       | string | yes      | Raw study material. Max 300,000 characters.                                 |
+| `output_format` | enum   | yes      | See formats below.                                                          |
+| `depth`         | enum   | no       | `quick` · `standard` (default) · `deep`.                                    |
+| `user_prompt`   | string | no       | Extra instructions. Max 1,000 chars.                                        |
+| `model`         | string | no       | Override model id. Defaults per provider (see above).                       |
 
 **Output formats**
 
@@ -43,7 +48,7 @@ key — StudySync never stores it or bills against it.
 | `summary`            | `{ headline, key_points, detail }`                   |
 | `mind_map`           | `{ root: { concept, children: [...] } }`             |
 
-**Example**
+**Example — OpenAI**
 
 ```bash
 curl -X POST https://studysync-api-0lru.onrender.com/v1/public/generate \
@@ -56,12 +61,25 @@ curl -X POST https://studysync-api-0lru.onrender.com/v1/public/generate \
   }'
 ```
 
+**Example — Claude**
+
+```bash
+curl -X POST https://studysync-api-0lru.onrender.com/v1/public/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "llm_key": "sk-ant-...",
+    "content": "Mitochondria are the powerhouse of the cell...",
+    "output_format": "flashcards"
+  }'
+```
+
 **Response**
 
 ```json
 {
   "output_format": "flashcards",
   "depth": "standard",
+  "provider": "openai",
   "output": {
     "cards": [
       { "front": "What do mitochondria produce?", "back": "ATP via oxidative phosphorylation.", "topic": "Cell biology" }
@@ -85,9 +103,9 @@ All errors return `{ "error": string, "message": string, "status": number }`.
 | ------ | --------------------------------------------- |
 | 401    | Invalid `llm_key`                             |
 | 422    | Validation error                              |
-| 429    | OpenAI rate limit                             |
+| 429    | Provider rate limit                           |
 | 502    | LLM returned invalid JSON                     |
-| 503    | OpenAI unreachable                            |
+| 503    | LLM provider unreachable                      |
 
 ---
 

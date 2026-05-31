@@ -17,6 +17,7 @@
     "sdk:generate": "tsx scripts/dump-openapi.ts && openapi-typescript sdk/openapi.json -o sdk/src/schema.d.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
     "@hono/node-server": "^1.13.7",
     "@hono/zod-validator": "^0.4.2",
     "@notionhq/client": "^2.2.15",

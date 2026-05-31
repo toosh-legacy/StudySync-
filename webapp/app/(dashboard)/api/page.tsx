@@ -95,8 +95,10 @@ export default async function ApiDocsPage() {
                   <td className="px-4 py-2 font-mono text-xs">llm_key</td>
                   <td className="px-4 py-2 font-mono text-xs">string</td>
                   <td className="px-4 py-2 text-xs text-muted-foreground">
-                    Required. Your OpenAI API key. Used only for this single
-                    request; not stored.
+                    Required. Your OpenAI <em>or</em> Anthropic API key — the
+                    provider is auto-detected from the prefix
+                    (<code>sk-ant-*</code> → Claude, else OpenAI). Used only
+                    for this single request; not stored.
                   </td>
                 </tr>
                 <tr>
@@ -133,8 +135,9 @@ export default async function ApiDocsPage() {
                   <td className="px-4 py-2 font-mono text-xs">model</td>
                   <td className="px-4 py-2 font-mono text-xs">string</td>
                   <td className="px-4 py-2 text-xs text-muted-foreground">
-                    Optional. OpenAI model id. Defaults to{' '}
-                    <code>gpt-4o-mini</code>.
+                    Optional. Override model id. Defaults to{' '}
+                    <code>gpt-4o-mini</code> for OpenAI keys and{' '}
+                    <code>claude-haiku-4-5-20251001</code> for Anthropic keys.
                   </td>
                 </tr>
               </tbody>

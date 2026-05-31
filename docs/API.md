@@ -28,12 +28,12 @@ curl -X POST https://studysync-api-0lru.onrender.com/v1/public/generate \
 
 | Field           | Type   | Required | Notes                                                                       |
 | --------------- | ------ | -------- | --------------------------------------------------------------------------- |
-| `llm_key`       | string | yes      | Your OpenAI API key. Used only for this single request; not stored.         |
+| `llm_key`       | string | yes      | Your OpenAI **or** Anthropic API key. `sk-ant-*` → Claude, else OpenAI. Used only for this single request; not stored. |
 | `content`       | string | yes      | Raw study material. Max 300,000 characters.                                 |
 | `output_format` | enum   | yes      | One of the formats below.                                                   |
 | `depth`         | enum   | no       | `quick` · `standard` (default) · `deep`.                                    |
 | `user_prompt`   | string | no       | Extra instructions (e.g. "focus on chapter 3"). Max 1,000 chars.            |
-| `model`         | string | no       | OpenAI model id. Defaults to `gpt-4o-mini`.                                 |
+| `model`         | string | no       | Override model id. Defaults: `gpt-4o-mini` (OpenAI) or `claude-haiku-4-5-20251001` (Anthropic). |
 
 ### Output formats
 
