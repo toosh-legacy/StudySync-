@@ -9,7 +9,7 @@ import {
   BookOpen,
   Cable,
   Settings,
-  KeyRound,
+  FileCode2,
 } from 'lucide-react';
 import { UserMenu, type UserMenuProps } from './UserMenu';
 
@@ -19,21 +19,27 @@ const navItems = [
   { href: '/courses', label: 'Courses', icon: BookOpen },
   { href: '/connections', label: 'Connections', icon: Cable },
   { href: '/settings', label: 'Settings', icon: Settings },
-  { href: '/api-keys', label: 'API Keys', icon: KeyRound },
+  { href: '/api', label: 'API / Docs', icon: FileCode2 },
 ];
 
 export function Sidebar({ user }: { user: UserMenuProps }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex md:w-64 md:flex-col md:border-r-2 md:border-foreground md:bg-sidebar">
-      <div className="flex h-16 items-center px-5 brutal-border-thick border-x-0 border-t-0">
+    <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-border md:bg-sidebar">
+      <div className="flex h-16 items-center border-b border-border px-5">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 text-xl font-black uppercase tracking-wider"
+          className="flex items-center gap-2 text-xl font-black tracking-tight"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-sm brutal-border bg-accent text-base text-accent-foreground">
-            ☥
+          <span
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-base"
+            style={{
+              background: 'linear-gradient(150deg, var(--primary), var(--accent))',
+              color: 'var(--primary-foreground)',
+            }}
+          >
+            ◆
           </span>
           StudySync
         </Link>
@@ -46,14 +52,14 @@ export function Sidebar({ user }: { user: UserMenuProps }) {
               key={href}
               href={href}
               className={cn(
-                'group relative flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm font-semibold transition-all',
+                'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors',
                 active
-                  ? 'bg-card brutal-border brutal-shadow-sm translate-x-[-1px] translate-y-[-1px]'
-                  : 'text-sidebar-foreground/80 hover:bg-card hover:brutal-border hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                  ? 'bg-primary/12 text-foreground'
+                  : 'text-sidebar-foreground/70 hover:bg-foreground/5 hover:text-foreground',
               )}
             >
               {active && (
-                <span className="absolute -left-1.5 top-1/2 h-6 w-1.5 -translate-y-1/2 bg-accent" />
+                <span className="absolute -left-1 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-primary" />
               )}
               <Icon className="h-4 w-4" />
               {label}

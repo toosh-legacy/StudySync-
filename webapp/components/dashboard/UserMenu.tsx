@@ -50,11 +50,11 @@ export function UserMenu({ email, displayName, avatarUrl }: UserMenuProps) {
             <Settings className="h-4 w-4" /> Settings
           </Link>
           <Link
-            href="/api-keys"
+            href="/api"
             className="flex items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-muted"
             onClick={() => setOpen(false)}
           >
-            <KeyRound className="h-4 w-4" /> API keys
+            <KeyRound className="h-4 w-4" /> API / Docs
           </Link>
           <button
             type="button"
