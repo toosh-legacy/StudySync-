@@ -48,6 +48,12 @@ it. The provider is auto-detected from the key prefix:
 | `summary`            | `{ headline, key_points, detail }`                   |
 | `mind_map`           | `{ root: { concept, children: [...] } }`             |
 
+**One-liner (paste into bash, swap `YOUR_KEY`)**
+
+```bash
+curl -sS -X POST https://studysync-api-0lru.onrender.com/v1/public/generate -H "Content-Type: application/json" -d '{"llm_key":"YOUR_KEY","content":"Mitochondria generate ATP through oxidative phosphorylation. The Krebs cycle runs in the matrix.","output_format":"flashcards","depth":"quick"}'
+```
+
 **Example — OpenAI**
 
 ```bash
